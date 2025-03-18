@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class CubeManager : MonoBehaviour
 {
@@ -10,14 +11,46 @@ public class CubeManager : MonoBehaviour
     private int currentIndex = 0; // Текущий куб
     private bool isGameOver = false; // Флаг Game Over
     private AlphaFader alphaFader;
+    public GameObject _playBtn;
+    public GameObject _cashOutBtn;
+    private BetManager _betManager;
+    private float targetScaleZ;
+    public GameObject _loadCircle;
+    public Text _loadText;
 
     void Start()
     {
         alphaFader = GetComponent<AlphaFader>();
+        _betManager = GetComponent<BetManager>();
         foreach (var cube in cubes)
         {
             cube.gameObject.SetActive(false);
         }
+    }
+
+    public void EndGameAndShowWin()
+    {
+        StopAllCoroutines();
+        _betManager.CalculateWinnings(targetScaleZ);
+        isGameOver = true;
+        foreach (var cube in cubes)
+        {
+            cube.gameObject.SetActive(false);
+        }
+        StartCoroutine(ShowLoadCircle());
+    }
+
+    private IEnumerator ShowLoadCircle()
+    {
+        _loadCircle.SetActive(true);
+        _loadText.text = "3";
+        yield return new WaitForSeconds(1.0f);
+        _loadText.text = "2";
+        yield return new WaitForSeconds(1.0f);
+        _loadText.text = "1";
+        yield return new WaitForSeconds(1.0f);
+        _loadText.text = "0";
+        SceneManager.LoadScene("MainScene");
     }
 
     public void StartGame()
@@ -27,6 +60,8 @@ public class CubeManager : MonoBehaviour
             currentIndex = 0;
             isGameOver = false;
             StartCoroutine(GrowCube(cubes[currentIndex]));
+            _playBtn.SetActive(false);
+            _cashOutBtn.SetActive(true);
         }
     }
 
@@ -36,8 +71,7 @@ public class CubeManager : MonoBehaviour
         float growthDuration = 0.5f;
         float elapsedTime = 0f;
 
-        // 75% шанс получить z > 1f, 25% шанс получить z < 1f
-        float targetScaleZ = (Random.value < 0.25f) ? Random.Range(0.1f, 0.99f) : Random.Range(1.01f, 10f);
+        targetScaleZ = (Random.value < 0.35f) ? Random.Range(0.1f, 0.99f) : Random.Range(1.01f, 10f);
         currentcoeff.text = targetScaleZ.ToString("f2") + "x";
         coeffText[currentIndex].text = targetScaleZ.ToString("f2");
         while (elapsedTime < growthDuration)
@@ -50,7 +84,7 @@ public class CubeManager : MonoBehaviour
         }
         
         // Проверяем, прошел ли куб порог в 1f
-        if (cube.localScale.z < 1f)
+        if (cube.localScale.z < 1f || isGameOver == true)
         {
             isGameOver = true;
             Debug.Log("Game Over!");
