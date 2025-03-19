@@ -40,6 +40,23 @@ public class CubeManager : MonoBehaviour
         StartCoroutine(ShowLoadCircle());
     }
 
+    private void RestartGame()
+    {
+        StartCoroutine(WaitBeforeRestart());
+    }
+
+    private IEnumerator WaitBeforeRestart()
+    {
+        yield return new WaitForSeconds(1.0f);
+        StopAllCoroutines();
+        isGameOver = true;
+        foreach (var cube in cubes)
+        {
+            cube.gameObject.SetActive(false);
+        }
+        StartCoroutine(ShowLoadCircle());
+    }
+
     private IEnumerator ShowLoadCircle()
     {
         _loadCircle.SetActive(true);
@@ -88,6 +105,7 @@ public class CubeManager : MonoBehaviour
         {
             isGameOver = true;
             Debug.Log("Game Over!");
+            RestartGame();
         }
         else
         {
