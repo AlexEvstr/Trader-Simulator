@@ -97,6 +97,14 @@ public class BetManager : MonoBehaviour
         PlayerPrefs.Save();
     }
 
+    public float WinningsSum(float coeff)
+    {
+        float bet = float.Parse(betInput.text, CultureInfo.InvariantCulture);
+        float winnings = bet * coeff;
+        return winnings;
+
+    }
+
     private void UpdateBalanceText()
     {
         balanceText.text = balance.ToString("F2", CultureInfo.InvariantCulture);

@@ -1,7 +1,6 @@
 using UnityEngine;
 using System.Collections;
 using UnityEngine.UI;
-using UnityEngine.SceneManagement;
 
 public class CubeManager : MonoBehaviour
 {
@@ -17,9 +16,13 @@ public class CubeManager : MonoBehaviour
     private float targetScaleZ;
     public GameObject _loadCircle;
     public Text _loadText;
+    private PlayAutoSwitcher _playAutoSwitcher;
+    private AutoSettingsManager _autoSettingsManager;
 
     void Start()
     {
+        _autoSettingsManager = GetComponent<AutoSettingsManager>();
+        _playAutoSwitcher = GetComponent<PlayAutoSwitcher>();
         alphaFader = GetComponent<AlphaFader>();
         _betManager = GetComponent<BetManager>();
         foreach (var cube in cubes)
@@ -30,6 +33,7 @@ public class CubeManager : MonoBehaviour
 
     public void EndGameAndShowWin()
     {
+        _cashOutBtn.GetComponent<Button>().interactable = false;
         StopAllCoroutines();
         _betManager.CalculateWinnings(targetScaleZ);
         isGameOver = true;
@@ -47,12 +51,18 @@ public class CubeManager : MonoBehaviour
 
     private IEnumerator WaitBeforeRestart()
     {
+        _cashOutBtn.GetComponent<Button>().interactable = false;
+        _playAutoSwitcher.EnableBetButtons();
         yield return new WaitForSeconds(1.0f);
         StopAllCoroutines();
         isGameOver = true;
         foreach (var cube in cubes)
         {
             cube.gameObject.SetActive(false);
+        }
+        foreach (var item in coeffText)
+        {
+            item.text = "";
         }
         StartCoroutine(ShowLoadCircle());
     }
@@ -67,18 +77,43 @@ public class CubeManager : MonoBehaviour
         _loadText.text = "1";
         yield return new WaitForSeconds(1.0f);
         _loadText.text = "0";
-        SceneManager.LoadScene("MainScene");
+        _loadCircle.SetActive(false);
+
+
+        if (_playAutoSwitcher.gameMode == 0)
+        {
+            _cashOutBtn.SetActive(false);
+            _playBtn.SetActive(true);
+        }
+        else
+        {
+            if (_autoSettingsManager.selectedRounds > 0)
+            {
+                _autoSettingsManager.selectedRounds--;
+                _playAutoSwitcher.DisableBetButtons();
+                yield return new WaitForSeconds(0.5f);
+                StartGame();
+            }
+            else
+            {
+                _playAutoSwitcher.SwitchToPlay();
+                _cashOutBtn.SetActive(false);
+            }
+            
+        }
     }
 
     public void StartGame()
     {
         if (cubes.Length > 0)
         {
+            _betManager.TryPlaceBet();
             currentIndex = 0;
             isGameOver = false;
             StartCoroutine(GrowCube(cubes[currentIndex]));
             _playBtn.SetActive(false);
             _cashOutBtn.SetActive(true);
+            _cashOutBtn.GetComponent<Button>().interactable = true;
         }
     }
 
@@ -104,12 +139,35 @@ public class CubeManager : MonoBehaviour
         if (cube.localScale.z < 1f || isGameOver == true)
         {
             isGameOver = true;
-            Debug.Log("Game Over!");
             RestartGame();
         }
         else
         {
+            if (_playAutoSwitcher.gameMode == 1)
+            {
+                if (_autoSettingsManager.selectedOption == 0 && targetScaleZ >= _autoSettingsManager.xReached)
+                {
+                    Debug.Log($"targetX: {targetScaleZ}/xReached: {_autoSettingsManager.xReached}");
+                    yield return new WaitForSeconds(0.5f);
+                    EndGameAndShowWin();
+                }
+                else if (_autoSettingsManager.selectedOption == 1 && currentIndex + 1 >= _autoSettingsManager.steps)
+                {
+                    Debug.Log($"currentIndex: {currentIndex}/steps: {_autoSettingsManager.steps}");
+                    yield return new WaitForSeconds(0.5f);
+                    EndGameAndShowWin();
+                }
+                else if (_autoSettingsManager.selectedOption == 2 && _betManager.WinningsSum(targetScaleZ) >= _autoSettingsManager.winAmount)
+                {
+                    Debug.Log($"winnings: {_betManager.WinningsSum(targetScaleZ)}/winAmount: {_autoSettingsManager.winAmount}");
+                    yield return new WaitForSeconds(0.5f);
+                    EndGameAndShowWin();
+                }
+            }
+
             currentIndex++;
+            
+
             if (currentIndex < cubes.Length)
             {
                 alphaFader.StartFading();
@@ -118,7 +176,8 @@ public class CubeManager : MonoBehaviour
             }
             else
             {
-                Debug.Log("Victory! Все кубы успешно выросли.");
+                isGameOver = true;
+                RestartGame();
             }
         }
     }
