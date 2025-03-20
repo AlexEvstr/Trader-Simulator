@@ -12,7 +12,7 @@ public class BetManager : MonoBehaviour
     public float balance;
     private const string BALANCE_KEY = "PlayerBalance";
     private const float minBet = 1f;
-    public float Bet;
+    public float Bet = 1.0f;
 
     void Start()
     {

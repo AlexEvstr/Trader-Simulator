@@ -13,19 +13,22 @@ public class CubeManager : MonoBehaviour
     public GameObject _playBtn;
     public GameObject _cashOutBtn;
     private BetManager _betManager;
-    private float targetScaleZ;
+    public float targetScaleZ;
     public GameObject _loadCircle;
     public Text _loadText;
     private PlayAutoSwitcher _playAutoSwitcher;
     private AutoSettingsManager _autoSettingsManager;
+    private LivePlaysController _livePlaysController;
 
     void Start()
     {
+        _livePlaysController = GetComponent<LivePlaysController>();
         _autoSettingsManager = GetComponent<AutoSettingsManager>();
         _playAutoSwitcher = GetComponent<PlayAutoSwitcher>();
         alphaFader = GetComponent<AlphaFader>();
         _betManager = GetComponent<BetManager>();
         DisableCubesAndTetxs();
+        _livePlaysController.UpdateTexts();
     }
 
     public void DisableCubesAndTetxs()
@@ -88,6 +91,7 @@ public class CubeManager : MonoBehaviour
 
     private IEnumerator ShowLoadCircle()
     {
+        _livePlaysController.UpdateTexts();
         _loadCircle.SetActive(true);
         _loadText.text = "3";
         yield return new WaitForSeconds(1.0f);
