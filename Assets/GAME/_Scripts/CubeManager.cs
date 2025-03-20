@@ -24,6 +24,7 @@ public class CubeManager : MonoBehaviour
 
     void Start()
     {
+        MakeCubesGreen();
         _settingsController = GetComponent<SettingsController>();
         _livePlaysController = GetComponent<LivePlaysController>();
         _autoSettingsManager = GetComponent<AutoSettingsManager>();
@@ -46,6 +47,52 @@ public class CubeManager : MonoBehaviour
             item.text = "";
         }
     }
+
+    private void MakeCubesRed()
+    {
+        foreach (var cube in cubes)
+        {
+            Renderer renderer = cube.GetComponent<Renderer>();
+
+            if (renderer == null)
+            {
+                Debug.LogError($"❌ Ошибка: У {cube.name} нет компонента Renderer!");
+                continue; // Пропускаем этот объект
+            }
+
+            if (renderer.material == null)
+            {
+                Debug.LogError($"❌ Ошибка: У {cube.name} нет материала!");
+                continue; // Пропускаем этот объект
+            }
+
+            renderer.material.color = Color.red; // Меняем цвет на красный
+        }
+    }
+
+
+    public void MakeCubesGreen()
+    {
+        foreach (var cube in cubes)
+        {
+            Renderer renderer = cube.GetComponent<Renderer>();
+
+            if (renderer == null)
+            {
+                Debug.LogError($"❌ Ошибка: У {cube.name} нет компонента Renderer!");
+                continue; // Пропускаем этот объект
+            }
+
+            if (renderer.material == null)
+            {
+                Debug.LogError($"❌ Ошибка: У {cube.name} нет материала!");
+                continue; // Пропускаем этот объект
+            }
+
+            renderer.material.color = Color.green; // Меняем цвет
+        }
+    }
+
 
     public void EndGameAndShowWin()
     {
@@ -130,6 +177,8 @@ public class CubeManager : MonoBehaviour
             }
             
         }
+
+        MakeCubesGreen();
     }
 
     public void StartGame()
@@ -171,6 +220,7 @@ public class CubeManager : MonoBehaviour
         
         if (cube.localScale.z < 1f || isGameOver == true)
         {
+            MakeCubesRed();
             _settingsController.PlayLoseSound();
             isGameOver = true;
             if (_autoSettingsManager.marks[1])
