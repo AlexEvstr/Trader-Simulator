@@ -14,6 +14,8 @@ public class BetManager : MonoBehaviour
     private const float minBet = 1f;
     public float Bet = 1.0f;
 
+    public Text _winText;
+
     void Start()
     {
         betInput.text = "1.00";
@@ -94,6 +96,7 @@ public class BetManager : MonoBehaviour
         UpdateBalanceText();
         PlayerPrefs.SetFloat(BALANCE_KEY, balance);
         PlayerPrefs.Save();
+        _winText.text = winnings.ToString("f2");
     }
 
     public float WinningsSum(float coeff)

@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -21,6 +19,10 @@ public class SettingsController : MonoBehaviour
     [SerializeField] private Sprite[] _avatars;
     [SerializeField] private Image[] _playerAvatar;
     [SerializeField] private GameObject[] _imageToChoose;
+
+    [SerializeField] private AudioClip _click;
+    [SerializeField] private AudioClip _win;
+    [SerializeField] private AudioClip _lose; 
 
     private string playerNameText;
 
@@ -135,5 +137,20 @@ public class SettingsController : MonoBehaviour
             item.sprite = _avatars[index];
         }
         PlayerPrefs.SetInt("SavedAvatar", index);
+    }
+
+    public void PlayClickSound()
+    {
+        _soundManager.PlayOneShot(_click);
+    }
+
+    public void PlayWinSound()
+    {
+        _soundManager.PlayOneShot(_win);
+    }
+
+    public void PlayLoseSound()
+    {
+        _soundManager.PlayOneShot(_lose);
     }
 }

@@ -19,10 +19,12 @@ public class CubeManager : MonoBehaviour
     private PlayAutoSwitcher _playAutoSwitcher;
     private AutoSettingsManager _autoSettingsManager;
     private LivePlaysController _livePlaysController;
+    private SettingsController _settingsController;
     public Button CancelButton;
 
     void Start()
     {
+        _settingsController = GetComponent<SettingsController>();
         _livePlaysController = GetComponent<LivePlaysController>();
         _autoSettingsManager = GetComponent<AutoSettingsManager>();
         _playAutoSwitcher = GetComponent<PlayAutoSwitcher>();
@@ -47,6 +49,7 @@ public class CubeManager : MonoBehaviour
 
     public void EndGameAndShowWin()
     {
+        _settingsController.PlayWinSound();
         _cashOutBtn.GetComponent<Button>().interactable = false;
         StopAllCoroutines();
         _betManager.CalculateWinnings(targetScaleZ);
@@ -168,6 +171,7 @@ public class CubeManager : MonoBehaviour
         
         if (cube.localScale.z < 1f || isGameOver == true)
         {
+            _settingsController.PlayLoseSound();
             isGameOver = true;
             if (_autoSettingsManager.marks[1])
             {
