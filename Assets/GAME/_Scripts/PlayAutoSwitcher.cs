@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class PlayAutoSwitcher : MonoBehaviour
@@ -10,12 +11,16 @@ public class PlayAutoSwitcher : MonoBehaviour
     [SerializeField] private InputField _inputField;
     [SerializeField] private GameObject _playBtn;
     [SerializeField] private GameObject _cancelBtn;
+    [SerializeField] private GameObject _cashOutBtn;
     private AutoSettingsManager _autoSettingsManager;
+    private BetManager _betManager;
+    public float LastBalance;
 
     public int gameMode;
 
     private void Start()
     {
+        _betManager = GetComponent<BetManager>();
         _autoSettingsManager = GetComponent<AutoSettingsManager>();
         PlayBtn.onClick.AddListener(SwitchToPlay);
         AutoBtn.onClick.AddListener(SwitchToAuto);
@@ -36,6 +41,7 @@ public class PlayAutoSwitcher : MonoBehaviour
 
         _playBtn.SetActive(true);
         _cancelBtn.SetActive(false);
+        _cashOutBtn.SetActive(false);
     }
 
     private void SwitchToAuto()
@@ -54,11 +60,14 @@ public class PlayAutoSwitcher : MonoBehaviour
         _playBtn.SetActive(false);
         _cancelBtn.SetActive(true);
         _autoSettingsManager.ResetSettings();
+
+        LastBalance = _betManager.balance;
     }
 
     private void CancelButton()
     {
-        SwitchToPlay();
+        //SwitchToPlay();
+        SceneManager.LoadScene("MainScene");
     }
 
     public void DisableBetButtons()

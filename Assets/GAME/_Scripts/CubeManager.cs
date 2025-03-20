@@ -4,11 +4,11 @@ using UnityEngine.UI;
 
 public class CubeManager : MonoBehaviour
 {
-    public Transform[] cubes; // Массив кубов
-    public Text[] coeffText; // Массив кубов
-    public Text currentcoeff; // Массив кубов
-    private int currentIndex = 0; // Текущий куб
-    private bool isGameOver = false; // Флаг Game Over
+    public Transform[] cubes;
+    public Text[] coeffText;
+    public Text currentcoeff;
+    private int currentIndex = 0;
+    private bool isGameOver = false;
     private AlphaFader alphaFader;
     public GameObject _playBtn;
     public GameObject _cashOutBtn;
@@ -25,9 +25,18 @@ public class CubeManager : MonoBehaviour
         _playAutoSwitcher = GetComponent<PlayAutoSwitcher>();
         alphaFader = GetComponent<AlphaFader>();
         _betManager = GetComponent<BetManager>();
+        DisableCubesAndTetxs();
+    }
+
+    public void DisableCubesAndTetxs()
+    {
         foreach (var cube in cubes)
         {
             cube.gameObject.SetActive(false);
+        }
+        foreach (var item in coeffText)
+        {
+            item.text = "";
         }
     }
 
@@ -36,11 +45,28 @@ public class CubeManager : MonoBehaviour
         _cashOutBtn.GetComponent<Button>().interactable = false;
         StopAllCoroutines();
         _betManager.CalculateWinnings(targetScaleZ);
-        isGameOver = true;
-        foreach (var cube in cubes)
+
+        if (_playAutoSwitcher.gameMode == 1)
         {
-            cube.gameObject.SetActive(false);
+            if (_autoSettingsManager.marks[0])
+            {
+                if (_betManager.balance - _playAutoSwitcher.LastBalance >= _autoSettingsManager.profitIncrease)
+                {                    
+                    _playAutoSwitcher.SwitchToPlay();
+                }
+            }
+            
+            if (_autoSettingsManager.marks[2])
+            {
+                if (_betManager.WinningsSum(targetScaleZ) >= _autoSettingsManager.profitSingleWin)
+                {                    
+                    _playAutoSwitcher.SwitchToPlay();
+                }
+            }
         }
+
+        isGameOver = true;
+        DisableCubesAndTetxs();
         StartCoroutine(ShowLoadCircle());
     }
 
@@ -56,14 +82,7 @@ public class CubeManager : MonoBehaviour
         yield return new WaitForSeconds(1.0f);
         StopAllCoroutines();
         isGameOver = true;
-        foreach (var cube in cubes)
-        {
-            cube.gameObject.SetActive(false);
-        }
-        foreach (var item in coeffText)
-        {
-            item.text = "";
-        }
+        DisableCubesAndTetxs();
         StartCoroutine(ShowLoadCircle());
     }
 
@@ -119,7 +138,7 @@ public class CubeManager : MonoBehaviour
 
     IEnumerator GrowCube(Transform cube)
     {
-        cube.gameObject.SetActive(true); // Включаем куб
+        cube.gameObject.SetActive(true);
         float growthDuration = 0.5f;
         float elapsedTime = 0f;
 
@@ -135,11 +154,25 @@ public class CubeManager : MonoBehaviour
             yield return null;
         }
         
-        // Проверяем, прошел ли куб порог в 1f
         if (cube.localScale.z < 1f || isGameOver == true)
         {
             isGameOver = true;
-            RestartGame();
+            if (_autoSettingsManager.marks[1])
+            {
+                if (_playAutoSwitcher.LastBalance - _betManager.balance >= _autoSettingsManager.profitDecrease)
+                {
+                    _playAutoSwitcher.SwitchToPlay();
+                    DisableCubesAndTetxs();
+                }
+                else
+                {
+                    RestartGame();
+                }
+            }
+            else
+            {
+                RestartGame();
+            }
         }
         else
         {
@@ -147,19 +180,16 @@ public class CubeManager : MonoBehaviour
             {
                 if (_autoSettingsManager.selectedOption == 0 && targetScaleZ >= _autoSettingsManager.xReached)
                 {
-                    Debug.Log($"targetX: {targetScaleZ}/xReached: {_autoSettingsManager.xReached}");
                     yield return new WaitForSeconds(0.5f);
                     EndGameAndShowWin();
                 }
                 else if (_autoSettingsManager.selectedOption == 1 && currentIndex + 1 >= _autoSettingsManager.steps)
-                {
-                    Debug.Log($"currentIndex: {currentIndex}/steps: {_autoSettingsManager.steps}");
+                {                    
                     yield return new WaitForSeconds(0.5f);
                     EndGameAndShowWin();
                 }
                 else if (_autoSettingsManager.selectedOption == 2 && _betManager.WinningsSum(targetScaleZ) >= _autoSettingsManager.winAmount)
-                {
-                    Debug.Log($"winnings: {_betManager.WinningsSum(targetScaleZ)}/winAmount: {_autoSettingsManager.winAmount}");
+                {                    
                     yield return new WaitForSeconds(0.5f);
                     EndGameAndShowWin();
                 }
@@ -172,7 +202,7 @@ public class CubeManager : MonoBehaviour
             {
                 alphaFader.StartFading();
                 yield return new WaitForSeconds(3.0f);
-                StartCoroutine(GrowCube(cubes[currentIndex])); // Запускаем следующий куб
+                StartCoroutine(GrowCube(cubes[currentIndex]));
             }
             else
             {

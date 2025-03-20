@@ -4547,11 +4547,11 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 997482191}
         m_TargetAssemblyTypeName: AutoSettingsManager, Assembly-CSharp
-        m_MethodName: ValidateInputField
-        m_Mode: 2
+        m_MethodName: ValidateProfitInputs
+        m_Mode: 1
         m_Arguments:
-          m_ObjectArgument: {fileID: 663510285}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.UI.InputField, UnityEngine.UI
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -4904,11 +4904,11 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 997482191}
         m_TargetAssemblyTypeName: AutoSettingsManager, Assembly-CSharp
-        m_MethodName: ValidateInputField
-        m_Mode: 2
+        m_MethodName: ValidateProfitInputs
+        m_Mode: 1
         m_Arguments:
-          m_ObjectArgument: {fileID: 671351706}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.UI.InputField, UnityEngine.UI
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -6807,6 +6807,8 @@ MonoBehaviour:
   - {fileID: 1657059755}
   - {fileID: 1012619182}
   - {fileID: 1983392148}
+  balance: 0
+  Bet: 0
 --- !u!114 &997482191
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6850,8 +6852,12 @@ MonoBehaviour:
   - {fileID: 1557093857}
   - {fileID: 663510285}
   - {fileID: 671351706}
+  profitIncrease: 25
+  profitDecrease: 25
+  profitSingleWin: 25
   autoSettingsPanel: {fileID: 2065106160}
   startAutoButton: {fileID: 2009527157}
+  marks: 
 --- !u!114 &997482192
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6879,6 +6885,8 @@ MonoBehaviour:
   _inputField: {fileID: 1063918193}
   _playBtn: {fileID: 295902848}
   _cancelBtn: {fileID: 1517348148}
+  _cashOutBtn: {fileID: 1263958483}
+  LastBalance: 0
   gameMode: 0
 --- !u!1 &1012414970
 GameObject:
@@ -10507,11 +10515,11 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 997482191}
         m_TargetAssemblyTypeName: AutoSettingsManager, Assembly-CSharp
-        m_MethodName: ValidateInputField
-        m_Mode: 2
+        m_MethodName: ValidateProfitInputs
+        m_Mode: 1
         m_Arguments:
-          m_ObjectArgument: {fileID: 1557093857}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.UI.InputField, UnityEngine.UI
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 

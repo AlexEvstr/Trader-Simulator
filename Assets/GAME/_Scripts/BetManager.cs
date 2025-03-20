@@ -4,26 +4,24 @@ using System.Globalization;
 
 public class BetManager : MonoBehaviour
 {
-    public Text balanceText; // Текст с балансом
-    public InputField betInput; // Поле для ввода ставки
-    public Button plusButton, minusButton; // Кнопки + и -
-    public Button[] betButtons; // Кнопки 1.0, 2.0, 5.0, 10.0
+    public Text balanceText;
+    public InputField betInput;
+    public Button plusButton, minusButton;
+    public Button[] betButtons;
 
-    private float balance;
-    private const string BALANCE_KEY = "PlayerBalance"; // Ключ для хранения баланса
-    private const float minBet = 1f; // Минимальная ставка
+    public float balance;
+    private const string BALANCE_KEY = "PlayerBalance";
+    private const float minBet = 1f;
+    public float Bet;
 
     void Start()
     {
         betInput.text = "1.00";
-        // Загружаем баланс или устанавливаем 100 по умолчанию
         balance = PlayerPrefs.GetFloat(BALANCE_KEY, 100f);
         UpdateBalanceText();
 
-        // Ограничиваем ввод только цифрами и точкой
         betInput.onValueChanged.AddListener(ValidateInput);
 
-        // Добавляем обработчики кнопок + и -
         plusButton.onClick.AddListener(() => ChangeBet(1f));
         minusButton.onClick.AddListener(() => ChangeBet(-1f));
     }
@@ -39,8 +37,9 @@ public class BetManager : MonoBehaviour
         }
         else if (bet > balance)
         {
-            betInput.text = balance.ToString("F2", CultureInfo.InvariantCulture); // Если ставка больше баланса, ставим баланс
+            betInput.text = balance.ToString("F2", CultureInfo.InvariantCulture);
         }
+        Bet = bet;
     }
 
 
@@ -48,7 +47,7 @@ public class BetManager : MonoBehaviour
     {
         float bet = float.Parse(betInput.text, CultureInfo.InvariantCulture);
         bet += amount;
-        bet = Mathf.Clamp(bet, minBet, balance); // Не меньше 1 и не больше баланса
+        bet = Mathf.Clamp(bet, minBet, balance);
         betInput.text = bet.ToString("F2", CultureInfo.InvariantCulture);
     }
 

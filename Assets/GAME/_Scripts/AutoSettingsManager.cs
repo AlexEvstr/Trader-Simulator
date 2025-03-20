@@ -5,31 +5,38 @@ using System.Globalization;
 public class AutoSettingsManager : MonoBehaviour
 {
     [Header("Number of Rounds")]
-    public Button[] roundsButtons; // Кнопки 10, 20, 50, 100
+    public Button[] roundsButtons;
     public int selectedRounds = 10;
     public int selectedOption;
 
     [Header("Auto Cash Out After")]
-    public Button[] cashOutButtons; // Кнопки X reached, Steps, Win Amount
-    public Button[] xReachedAdjustButtons; // Кнопки + и - для X reached
-    public Button[] stepsAdjustButtons; // Кнопки + и - для Steps
-    public Text xReachedValue, stepsValue; // Отображение значений
-    public InputField winAmountInput; // Поле для Win Amount
+    public Button[] cashOutButtons;
+    public Button[] xReachedAdjustButtons;
+    public Button[] stepsAdjustButtons;
+    public Text xReachedValue, stepsValue;
+    public InputField winAmountInput;
     public float xReached = 7.0f;
     public int steps = 3;
     public float winAmount = 50.0f;
 
     [Header("Stop Auto Game If Profit")]
-    public Button[] profitButtons; // 3 кнопки выбора
-    public InputField[] profitInputs; // Поля ввода (3 шт.)
+    public Button[] profitButtons;
+    public InputField[] profitInputs;
+
+    public float profitIncrease = 25.0f;
+    public float profitDecrease = 25.0f;
+    public float profitSingleWin = 25.0f;
 
     [Header("Other")]
-    public GameObject autoSettingsPanel; // Окно автоигры
+    public GameObject autoSettingsPanel;
     public Button startAutoButton;
     private CubeManager _cubeManager;
+    public bool[] marks;
 
     void Start()
     {
+        marks = new bool[] { true, false, false };
+
         _cubeManager = GetComponent<CubeManager>();
 
         for (int i = 0; i < profitButtons.Length; i++)
@@ -38,20 +45,15 @@ public class AutoSettingsManager : MonoBehaviour
             profitButtons[i].onClick.AddListener(() => ToggleProfitOption(index));
         }
 
-        // Кнопки для изменения X reached
         xReachedAdjustButtons[0].onClick.AddListener(() => AdjustXReached(-0.1f));
         xReachedAdjustButtons[1].onClick.AddListener(() => AdjustXReached(0.1f));
 
-        // Кнопки для изменения Steps
         stepsAdjustButtons[0].onClick.AddListener(() => AdjustSteps(-1));
         stepsAdjustButtons[1].onClick.AddListener(() => AdjustSteps(1));
 
-        // Сбрасываем настройки в начале
         ResetSettings();
     }
 
-    // Выбор кнопки по значению (например, roundsButtons)
-    // Выбор количества раундов (работает как у тебя)
     public void SelectRounds(int value)
     {
         selectedRounds = value;
@@ -62,7 +64,6 @@ public class AutoSettingsManager : MonoBehaviour
         }
     }
 
-    // Выбор Auto Cash Out After (X reached, Steps, Win Amount)
     public void SelectOption(int index)
     {
         selectedOption = index;
@@ -85,60 +86,79 @@ public class AutoSettingsManager : MonoBehaviour
             }
         }
 
-        // Включаем или выключаем кнопку Start Auto
         startAutoButton.interactable = anySelected;
     }
 
-    // Выбор Stop Auto Game If Profit (можно выбрать несколько)
     public void ToggleProfitOption(int index)
     {
         bool isActive = profitButtons[index].transform.GetChild(0).gameObject.activeSelf;
         profitButtons[index].transform.GetChild(0).gameObject.SetActive(!isActive);
 
-        // Проверяем выбор после изменения
+        marks[index] = !isActive;
+
         CheckProfitSelection();
     }
 
-
-    // Изменение X reached
     private void AdjustXReached(float amount)
     {
         xReached = Mathf.Max(0.10f, xReached + amount);
         xReachedValue.text = xReached.ToString("F2", CultureInfo.InvariantCulture);
     }
 
-    // Изменение Steps
     private void AdjustSteps(int amount)
     {
         steps = Mathf.Max(1, steps + amount);
         stepsValue.text = steps.ToString();
     }
 
-    // Валидация Win Amount
     public void ValidateWinAmount()
     {
         if (string.IsNullOrEmpty(winAmountInput.text) || !float.TryParse(winAmountInput.text, NumberStyles.Float, CultureInfo.InvariantCulture, out winAmount) || winAmount < 0.10f)
         {
-            winAmount = 0.10f;
+            winAmount = 50.0f;
         }
         winAmountInput.text = winAmount.ToString("F2", CultureInfo.InvariantCulture);
     }
 
-    // Валидация полей Stop Auto Game If Profit
-    public void ValidateProfitFields()
+    public void ValidateProfitInputs()
     {
-        for (int i = 0; i < profitInputs.Length; i++)
+        float value;
+
+        if (string.IsNullOrEmpty(profitInputs[0].text) ||
+            !float.TryParse(profitInputs[0].text, NumberStyles.Float, CultureInfo.InvariantCulture, out value) || value < 0.10f)
         {
-            float value;
-            if (string.IsNullOrEmpty(profitInputs[i].text) ||
-                !float.TryParse(profitInputs[i].text, NumberStyles.Float, CultureInfo.InvariantCulture, out value) || value < 0.10f)
-            {
-                profitInputs[i].text = "0.10";
-            }
+            profitIncrease = 25.0f;
         }
+        else
+        {
+            profitIncrease = value;
+        }
+
+        if (string.IsNullOrEmpty(profitInputs[1].text) ||
+            !float.TryParse(profitInputs[1].text, NumberStyles.Float, CultureInfo.InvariantCulture, out value) || value < 0.10f)
+        {
+            profitDecrease = 25.0f;
+        }
+        else
+        {
+            profitDecrease = value;
+        }
+
+        if (string.IsNullOrEmpty(profitInputs[2].text) ||
+            !float.TryParse(profitInputs[2].text, NumberStyles.Float, CultureInfo.InvariantCulture, out value) || value < 0.10f)
+        {
+            profitSingleWin = 25.0f;
+        }
+        else
+        {
+            profitSingleWin = value;
+        }
+
+        profitInputs[0].text = profitIncrease.ToString("F2", CultureInfo.InvariantCulture);
+        profitInputs[1].text = profitDecrease.ToString("F2", CultureInfo.InvariantCulture);
+        profitInputs[2].text = profitSingleWin.ToString("F2", CultureInfo.InvariantCulture);
     }
 
-    // Метод закрытия окна (Start Auto)
     public void StartAuto()
     {
         autoSettingsPanel.SetActive(false);
@@ -146,10 +166,8 @@ public class AutoSettingsManager : MonoBehaviour
         selectedRounds--;
     }
 
-    // Метод сброса всех настроек (Reset)
     public void ResetSettings()
     {
-        // Number of Rounds
         SelectRounds(10);
         SelectOption(0);
 
@@ -160,11 +178,10 @@ public class AutoSettingsManager : MonoBehaviour
         stepsValue.text = steps.ToString();
         winAmountInput.text = winAmount.ToString("F2", CultureInfo.InvariantCulture);
 
-        // Stop Auto Game If Profit (только первая кнопка активна)
         for (int i = 0; i < profitButtons.Length; i++)
         {
             profitButtons[i].transform.GetChild(0).gameObject.SetActive(i == 0);
-            profitInputs[i].text = "0.10";
+            profitInputs[i].text = "25.00";
         }
     }
 
@@ -172,7 +189,6 @@ public class AutoSettingsManager : MonoBehaviour
     {
         float value;
 
-        // Если поле пустое или содержит некорректное значение — ставим 0.10f
         if (string.IsNullOrEmpty(inputField.text) ||
             !float.TryParse(inputField.text, System.Globalization.NumberStyles.Float,
                             System.Globalization.CultureInfo.InvariantCulture, out value) ||
@@ -181,9 +197,6 @@ public class AutoSettingsManager : MonoBehaviour
             value = 0.10f;
         }
 
-        // Устанавливаем корректное значение обратно в InputField
         inputField.text = value.ToString("F2", System.Globalization.CultureInfo.InvariantCulture);
     }
-
-
 }

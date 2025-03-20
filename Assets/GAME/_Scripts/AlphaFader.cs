@@ -5,19 +5,19 @@ using UnityEngine.UI;
 
 public class AlphaFader : MonoBehaviour
 {
-    public List<Image> points; // Список точек (добавить в инспекторе)
-    private float totalDuration = 3f; // Общее время анимации
+    public List<Image> points;
+    private float totalDuration = 3f;
     private float fadeTime;
 
     void Start()
     {
-        fadeTime = totalDuration / points.Count; // Время для каждой точки
-        SetAlpha(0.1f); // Устанавливаем стартовую альфу
+        fadeTime = totalDuration / points.Count;
+        SetAlpha(0.1f);
     }
 
-    public void StartFading() // Можно вызвать из другого скрипта
+    public void StartFading()
     {
-        StopAllCoroutines(); // Останавливаем предыдущие анимации (если были)
+        StopAllCoroutines();
         StartCoroutine(FadePoints());
     }
 
@@ -33,7 +33,6 @@ public class AlphaFader : MonoBehaviour
 
     private IEnumerator FadePoints()
     {
-        // По очереди увеличиваем альфу каждой точки
         foreach (var point in points)
         {
             float elapsedTime = 0f;
@@ -51,7 +50,6 @@ public class AlphaFader : MonoBehaviour
             point.color = endColor;
         }
 
-        // После всех точек плавно уменьшаем альфу обратно
         float elapsedTimeReset = 0f;
         while (elapsedTimeReset < fadeTime)
         {
@@ -61,6 +59,6 @@ public class AlphaFader : MonoBehaviour
             yield return null;
         }
 
-        SetAlpha(0.1f); // Гарантированно ставим 0.1f в конце
+        SetAlpha(0.1f);
     }
 }
