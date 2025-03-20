@@ -19,6 +19,7 @@ public class CubeManager : MonoBehaviour
     private PlayAutoSwitcher _playAutoSwitcher;
     private AutoSettingsManager _autoSettingsManager;
     private LivePlaysController _livePlaysController;
+    public Button CancelButton;
 
     void Start()
     {
@@ -29,6 +30,7 @@ public class CubeManager : MonoBehaviour
         _betManager = GetComponent<BetManager>();
         DisableCubesAndTetxs();
         _livePlaysController.UpdateTexts();
+        CancelButton.interactable = false;
     }
 
     public void DisableCubesAndTetxs()
@@ -91,6 +93,7 @@ public class CubeManager : MonoBehaviour
 
     private IEnumerator ShowLoadCircle()
     {
+        CancelButton.interactable = true;
         _livePlaysController.UpdateTexts();
         _loadCircle.SetActive(true);
         _loadText.text = "3";
@@ -101,7 +104,7 @@ public class CubeManager : MonoBehaviour
         yield return new WaitForSeconds(1.0f);
         _loadText.text = "0";
         _loadCircle.SetActive(false);
-
+        CancelButton.interactable = false;
 
         if (_playAutoSwitcher.gameMode == 0)
         {
@@ -137,6 +140,11 @@ public class CubeManager : MonoBehaviour
             _playBtn.SetActive(false);
             _cashOutBtn.SetActive(true);
             _cashOutBtn.GetComponent<Button>().interactable = true;
+        }
+        if (_playAutoSwitcher.gameMode == 1)
+        {
+            _cashOutBtn.SetActive(false);
+            _cashOutBtn.GetComponent<Button>().interactable = false;
         }
     }
 

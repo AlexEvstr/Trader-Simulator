@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class PlayAutoSwitcher : MonoBehaviour
@@ -59,6 +58,7 @@ public class PlayAutoSwitcher : MonoBehaviour
 
         _playBtn.SetActive(false);
         _cancelBtn.SetActive(true);
+        _cashOutBtn.SetActive(false);
         _autoSettingsManager.ResetSettings();
 
         LastBalance = _betManager.balance;
@@ -66,8 +66,8 @@ public class PlayAutoSwitcher : MonoBehaviour
 
     private void CancelButton()
     {
-        //SwitchToPlay();
-        SceneManager.LoadScene("MainScene");
+        SwitchToPlay();
+        //SceneManager.LoadScene("MainScene");
     }
 
     public void DisableBetButtons()
